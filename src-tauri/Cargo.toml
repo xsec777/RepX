@@ -1,0 +1,57 @@
+[package]
+name = "repx"
+version = "1.0.0"
+description = "RepX - 下一代轻量级 AI-Native HTTP 重放与流量审计工作台"
+authors = ["RepX"]
+edition = "2021"
+rust-version = "1.77"
+
+# 桌面端编译仅需 rlib，避免 MinGW ld 导出符号超过 65535 上限 (export ordinal too large)
+[lib]
+name = "repx_lib"
+crate-type = ["rlib"]
+
+# 生产模式必须显式开启：开启后 tauri::generate_context! 内嵌 dist 前端资源，
+# 否则会按 dev 模式去加载 devUrl (http://localhost:1420) 导致白屏 ERR_CONNECTION_REFUSED
+# 打包命令：cargo build --release --features custom-protocol
+# (不能设为 default，否则 npm run tauri dev 的开发热更新会失效)
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+tokio = { version = "1", features = ["full"] }
+axum = "0.7"
+tower-http = { version = "0.5", features = ["cors"] }
+
+# 网络层：rustls 走纯 Rust 实现，不依赖系统 OpenSSL；socks 支持代理链
+reqwest = { version = "0.12", default-features = false, features = [
+  "rustls-tls",
+  "cookies",
+  "gzip",
+  "brotli",
+  "deflate",
+  "socks",
+  "http2",
+  "charset",
+] }
+base64 = "0.22"
+
+# 只为了在 Windows 上把标题栏染成和界面一样的颜色（DwmSetWindowAttribute）
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Graphics_Dwm"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

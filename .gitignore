@@ -1,0 +1,34 @@
+# 构建产物
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+
+# 本机环境（工具链路径等私有配置，勿入库）
+dev-env.local.bat
+.env
+.env.local
+*.local
+
+# 编译好的可执行体：作为 Release 附件分发，不入源码库
+/RepX.exe
+/WebView2Loader.dll
+
+# RepX 项目数据（含真实目标流量，严禁入库）
+*.repx
+*.repx-shm
+*.repx-wal
+*.db
+*.db-shm
+*.db-wal
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# 临时文件
+临时文件/
+*.log
+*.har
